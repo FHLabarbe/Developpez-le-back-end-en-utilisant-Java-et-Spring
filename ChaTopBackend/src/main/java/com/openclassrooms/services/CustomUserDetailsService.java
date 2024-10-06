@@ -1,4 +1,4 @@
-package com.openclassrooms.configuration;
+package com.openclassrooms.services;
 
 import com.openclassrooms.model.DBUser;
 import com.openclassrooms.repository.DBUserRepository;
@@ -9,8 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 @Service
@@ -25,10 +23,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     if (user == null) {
       throw new UsernameNotFoundException("User not found with email: " + email);
     }
-    return User.builder()
-      .username(user.getEmail())
-      .password(user.getPassword())
-      .authorities(Collections.emptyList())
-      .build();
+    return new UserDetailsImpl(user.getId(), user.getEmail(), user.getName(), user.getPassword());
   }
 }

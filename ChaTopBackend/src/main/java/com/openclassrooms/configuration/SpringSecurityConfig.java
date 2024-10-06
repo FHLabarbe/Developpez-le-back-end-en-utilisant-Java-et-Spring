@@ -1,28 +1,21 @@
 package com.openclassrooms.configuration;
 
-import com.openclassrooms.services.JwtAuthenticationFilter;
-import com.openclassrooms.services.JwtService;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.openclassrooms.services.CustomUserDetailsService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import javax.sql.DataSource;
-import java.security.cert.Extension;
-import java.util.Collections;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -30,14 +23,25 @@ public class SpringSecurityConfig {
 
   @Autowired
   private CustomUserDetailsService customUserDetailsService;
+  private final String SECRET_KEY = "hjD3kP5f7hSDlMn6OP0qK2zX4s4zB2cH";
+
+  @Bean
+  public JwtEncoder jwtEncoder() {
+    return new NimbusJwtEncoder(new ImmutableSecret<>(this.SECRET_KEY.getBytes()));
+  }
+
+  @Bean
+  public ModelMapper modelMapper() {
+    return new ModelMapper();
+  }
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    return http.authorizeHttpRequests(auth -> {
-      auth
-        .requestMatchers("/login").permitAll()
-        .anyRequest().authenticated();
-    }).formLogin(Customizer.withDefaults()).build();
+    return http
+      .csrf(csrf -> csrf.disable())
+      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/register", "/api/auth/login").permitAll().anyRequest().authenticated())
+      .build();
   }
 
   @Bean

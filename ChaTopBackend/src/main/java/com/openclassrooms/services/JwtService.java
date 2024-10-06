@@ -1,44 +1,32 @@
 package com.openclassrooms.services;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.openclassrooms.model.UserDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class JwtService {
-  private final String SECRET_KEY = "rentalstokenkey";
-  private final long EXPIRATION_TIME = 86400000; // 1 jour
 
-  public String generateToken(String username) {
-    return Jwts.builder()
-      .setSubject(username)
-      .setIssuedAt(new Date())
-      .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-      .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-      .compact();
-  }
+  @Autowired
+  private JwtEncoder jwtEncoder;
 
-  public boolean validateToken(String token) {
-    return !isTokenExpired(token);
-  }
-
-  public String getUsernameFromToken(String token) {
-    Claims claims = Jwts.parser()
-      .setSigningKey(SECRET_KEY)
-      .parseClaimsJws(token)
-      .getBody();
-    return claims.getSubject();
-  }
-
-  private boolean isTokenExpired(String token) {
-    final Date expiration = Jwts.parser()
-      .setSigningKey(SECRET_KEY)
-      .parseClaimsJws(token)
-      .getBody()
-      .getExpiration();
-    return expiration.before(new Date());
+  public String generateToken(UserDTO userDTO) {
+    Instant now = Instant.now();
+    JwtClaimsSet claims = JwtClaimsSet.builder()
+      .issuer("self")
+      .issuedAt(now)
+      .expiresAt(now.plus(1, ChronoUnit.DAYS))
+      .subject(userDTO.getEmail())
+      .build();
+    JwtEncoderParameters jwtEncoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims);
+    return this.jwtEncoder.encode(jwtEncoderParameters).getTokenValue();
   }
 }
