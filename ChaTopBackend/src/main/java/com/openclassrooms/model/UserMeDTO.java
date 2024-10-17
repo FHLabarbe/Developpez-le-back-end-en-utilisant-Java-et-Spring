@@ -8,14 +8,12 @@ import lombok.NonNull;
 import java.time.LocalDateTime;
 
 @Data
-public class UserDTO{
-  private Integer id;
+public class UserMeDTO{
+  private Long id;
   @NonNull
   private String email;
   @NotNull(groups=OnRegister.class)
   private String name;
-  @NonNull
-  private String password;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 }

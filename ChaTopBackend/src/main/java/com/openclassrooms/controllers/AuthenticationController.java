@@ -1,20 +1,21 @@
 package com.openclassrooms.controllers;
 
-import com.openclassrooms.model.DBUser;
 import com.openclassrooms.model.UserDTO;
+import com.openclassrooms.model.UserMeDTO;
 import com.openclassrooms.repository.DBUserRepository;
 import com.openclassrooms.responses.TokenResponse;
-import com.openclassrooms.services.*;
+import com.openclassrooms.services.AuthenticationServiceImpl;
+import com.openclassrooms.services.CustomUserDetailsService;
+import com.openclassrooms.services.JwtService;
 import com.openclassrooms.validation.OnRegister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RequestMapping("/api/auth")
 @RestController
@@ -50,15 +51,14 @@ public class AuthenticationController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<UserDetailsImpl> getCurrentUser() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null || !authentication.isAuthenticated()) {
+  public ResponseEntity<UserMeDTO> getCurrentUser(Principal principal) {
+    try {
+      UserMeDTO userMeDTO = authenticationService.getCurrentUser(principal);
+      return ResponseEntity.ok(userMeDTO);
+    } catch (AccessDeniedException e) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
-    String email = authentication.getName();
-    UserDetailsImpl userDetails = (UserDetailsImpl) customUserDetailsService.loadUserByUsername(email);
-
-    return ResponseEntity.ok(userDetails);
   }
+
 
 }
