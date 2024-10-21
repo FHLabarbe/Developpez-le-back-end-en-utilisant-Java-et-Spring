@@ -29,8 +29,8 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
   @Override
   public void register(UserDTO userDTO) {
-    userDTO.setCreatedAt(LocalDateTime.now());
-    userDTO.setUpdatedAt(LocalDateTime.now());
+    userDTO.setCreated_at(LocalDateTime.now());
+    userDTO.setUpdated_at(LocalDateTime.now());
     userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
     DBUser dbUser = modelMapper.map(userDTO,DBUser.class);
     dbUserRepository.save(dbUser);
@@ -56,8 +56,8 @@ public class AuthenticationServiceImpl implements AuthenticationService{
     UserMeDTO userMeDTO = new UserMeDTO(userDetails.getEmail());
     userMeDTO.setId(userDetails.getId());
     userMeDTO.setName(userDetails.getName());
-    userMeDTO.setUpdatedAt(userDetails.getUpdatedAt());
-    userMeDTO.setCreatedAt(userDetails.getCreatedAt());
+    userMeDTO.setUpdated_at(userDetails.getUpdatedAt());
+    userMeDTO.setCreated_at(userDetails.getCreatedAt());
 
     return userMeDTO;
   }

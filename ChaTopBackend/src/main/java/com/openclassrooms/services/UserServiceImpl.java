@@ -20,8 +20,8 @@ public class UserServiceImpl implements UserService{
       UserMeDTO userMeDTO = new UserMeDTO(user.getEmail());
       userMeDTO.setId(id);
       userMeDTO.setName(user.getName());
-      userMeDTO.setCreatedAt(user.getCreatedAt());
-      userMeDTO.setUpdatedAt(user.getUpdatedAt());
+      userMeDTO.setCreated_at(user.getCreated_at());
+      userMeDTO.setUpdated_at(user.getUpdated_at());
       return userMeDTO;
     }
     return null;

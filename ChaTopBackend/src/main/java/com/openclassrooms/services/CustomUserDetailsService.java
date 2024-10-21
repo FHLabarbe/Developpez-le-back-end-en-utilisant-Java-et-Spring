@@ -20,6 +20,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     if (user == null) {
       throw new UsernameNotFoundException("User not found with email: " + username);
     }
-    return new UserDetailsImpl(user.getId(), user.getEmail(), user.getName(), user.getPassword(), user.getUpdatedAt(),user.getCreatedAt());
+    return new UserDetailsImpl(user.getId(), user.getEmail(), user.getName(), user.getPassword(), user.getUpdated_at(),user.getCreated_at());
   }
 }

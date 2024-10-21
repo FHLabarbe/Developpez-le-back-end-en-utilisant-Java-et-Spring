@@ -79,7 +79,10 @@ public class SpringSecurityConfig {
     return http
       .csrf(csrf -> csrf.disable())
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/register", "/api/auth/login","/v2/api-docs/**","/swagger-ui/**","/swagger-resources/**").permitAll().anyRequest().authenticated())
+      .authorizeHttpRequests(auth -> auth
+        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
+        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+        .anyRequest().authenticated())
       .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder())))
       .addFilterBefore(jwtAuthenticationFilter(jwtService(jwtEncoder(),jwtDecoder()),customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
       .build();
