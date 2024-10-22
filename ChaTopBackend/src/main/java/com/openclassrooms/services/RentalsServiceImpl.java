@@ -1,6 +1,7 @@
 package com.openclassrooms.services;
 
 import com.openclassrooms.model.DBUser;
+import com.openclassrooms.model.RentalUpdateDTO;
 import com.openclassrooms.model.Rentals;
 import com.openclassrooms.model.RentalsDTO;
 import com.openclassrooms.repository.DBUserRepository;
@@ -66,16 +67,14 @@ public class RentalsServiceImpl implements RentalsService {
   }
 
   @Override
-  public Rentals updateRental(Long id, RentalsDTO rentalsDTO) {
+  public Rentals updateRental(Long id, RentalUpdateDTO rentalUpdateDTO) {
     Optional<Rentals> optionalRental = rentalsRepository.findById(id);
     if (optionalRental.isPresent()) {
       Rentals rental = optionalRental.get();
-      rental.setName(rentalsDTO.getName());
-      rental.setSurface(rentalsDTO.getSurface());
-      rental.setPrice(rentalsDTO.getPrice());
-      rental.setPicture(rentalsDTO.getPicture());
-      rental.setDescription(rentalsDTO.getDescription());
-      rental.setOwner_id(rentalsDTO.getOwner_id());
+      rental.setName(rentalUpdateDTO.getName());
+      rental.setSurface(rentalUpdateDTO.getSurface());
+      rental.setPrice(rentalUpdateDTO.getPrice());
+      rental.setDescription(rentalUpdateDTO.getDescription());
       rental.setUpdated_at(LocalDateTime.now());
       return rentalsRepository.save(rental);
     } else {

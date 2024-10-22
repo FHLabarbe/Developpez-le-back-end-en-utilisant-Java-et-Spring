@@ -1,7 +1,9 @@
 package com.openclassrooms.controllers;
 
+import com.openclassrooms.model.RentalUpdateDTO;
 import com.openclassrooms.model.Rentals;
 import com.openclassrooms.model.RentalsDTO;
+import com.openclassrooms.model.RentalsListDTO;
 import com.openclassrooms.services.JwtService;
 import com.openclassrooms.services.RentalsServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,11 +34,12 @@ public class RentalsController {
   private JwtService jwtService;
 
   @Operation(summary = "Récupérer toutes les locations", description = "Retourne la liste complète des locations disponibles")
-  @ApiResponse(responseCode = "200", description = "Liste des locations retournée avec succès", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Rentals.class)))
+  @ApiResponse(responseCode = "200", description = "Liste des locations retournée avec succès", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RentalsListDTO.class)))
   @GetMapping
-  public ResponseEntity<Iterable<Rentals>> getAllRentals() {
+  public ResponseEntity<RentalsListDTO> getAllRentals() {
     Iterable<Rentals> rentals = rentalsService.getAllRentals();
-    return new ResponseEntity<>(rentals, HttpStatus.OK);
+    RentalsListDTO responseDTO = new RentalsListDTO(rentals);
+    return new ResponseEntity<>(responseDTO, HttpStatus.OK);
   }
 
   @Operation(summary = "Récupérer une location par son ID", description = "Retourne les détails d'une location à partir de son identifiant")
@@ -56,15 +59,26 @@ public class RentalsController {
   @Operation(summary = "Mettre à jour une location", description = "Mise à jour des détails d'une location existante")
   @ApiResponse(responseCode = "200", description = "Location mise à jour avec succès")
   @ApiResponse(responseCode = "404", description = "Location non trouvée")
-  @PutMapping("/{id}")
-  public ResponseEntity<String> updateRental(@Parameter(description = "ID de la location à mettre à jour", example = "1") @PathVariable Long id, @RequestBody RentalsDTO rentalsDTO) {
+  @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<String> updateRental(@PathVariable Long id,
+                                             @RequestParam("name") String name,
+                                             @RequestParam("surface") int surface,
+                                             @RequestParam("price") int price,
+                                             @RequestParam("description") String description) {
     try {
-      Rentals updatedRental = rentalsService.updateRental(id, rentalsDTO);
-      return new ResponseEntity<>("Rental updated !", HttpStatus.OK);
+      RentalUpdateDTO rentalUpdateDTO = new RentalUpdateDTO();
+      rentalUpdateDTO.setName(name);
+      rentalUpdateDTO.setSurface(surface);
+      rentalUpdateDTO.setPrice(price);
+      rentalUpdateDTO.setDescription(description);
+      rentalsService.updateRental(id, rentalUpdateDTO);
+
+      return new ResponseEntity<>("Rental updated!", HttpStatus.OK);
     } catch (EntityNotFoundException e) {
       return new ResponseEntity<>("Rental not found", HttpStatus.NOT_FOUND);
     }
   }
+
 
   @Operation(summary = "Créer une nouvelle location", description = "Crée une nouvelle location en fournissant les détails")
   @ApiResponse(responseCode = "200", description = "Location créée avec succès")
