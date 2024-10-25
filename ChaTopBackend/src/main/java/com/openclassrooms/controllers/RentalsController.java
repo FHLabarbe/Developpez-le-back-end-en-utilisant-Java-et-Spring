@@ -1,6 +1,7 @@
 package com.openclassrooms.controllers;
 
 import com.openclassrooms.model.*;
+import com.openclassrooms.responses.UpdateRentalResponse;
 import com.openclassrooms.services.JwtService;
 import com.openclassrooms.services.RentalsServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,10 +70,10 @@ public class RentalsController {
   @ApiResponse(responseCode = "404", description = "Location non trouvée")
   @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UpdateRentalResponse> updateRental(@PathVariable Long id,
-                                             @RequestParam("name") String name,
-                                             @RequestParam("surface") int surface,
-                                             @RequestParam("price") int price,
-                                             @RequestParam("description") String description) {
+                                                           @RequestParam("name") String name,
+                                                           @RequestParam("surface") int surface,
+                                                           @RequestParam("price") int price,
+                                                           @RequestParam("description") String description) {
     try {
       RentalUpdateDTO rentalUpdateDTO = new RentalUpdateDTO();
       rentalUpdateDTO.setName(name);
@@ -93,7 +94,7 @@ public class RentalsController {
   @ApiResponse(responseCode = "200", description = "Location créée avec succès")
   @ApiResponse(responseCode = "400", description = "Requête invalide ou données manquantes")
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> createRental(@RequestParam("name") String name,
+  public ResponseEntity<UpdateRentalResponse> createRental(@RequestParam("name") String name,
                                              @RequestParam("surface") int surface,
                                              @RequestParam("price") int price,
                                              @RequestParam("description") String description,
@@ -103,7 +104,8 @@ public class RentalsController {
     if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
       token = authorizationHeader.substring(7);
     } else {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token manquant ou invalide");
+      UpdateRentalResponse response = new UpdateRentalResponse("Token manquant ou invalide");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
     RentalsDTO rentalsDTO = new RentalsDTO();
     rentalsDTO.setName(name);
@@ -111,6 +113,7 @@ public class RentalsController {
     rentalsDTO.setPrice(price);
     rentalsDTO.setDescription(description);
     Rentals newRental = rentalsService.createRental(rentalsDTO, picture, token);
-    return ResponseEntity.ok("Rental created with ID: " + newRental.getId());
+    UpdateRentalResponse response = new UpdateRentalResponse("Rental created!");
+    return ResponseEntity.ok(response);
   }
 }

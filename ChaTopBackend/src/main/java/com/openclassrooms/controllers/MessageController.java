@@ -2,7 +2,7 @@ package com.openclassrooms.controllers;
 
 
 import com.openclassrooms.model.MessageDTO;
-import com.openclassrooms.model.MessageResponse;
+import com.openclassrooms.responses.MessageResponse;
 import com.openclassrooms.services.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
