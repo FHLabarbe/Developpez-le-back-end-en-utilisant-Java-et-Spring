@@ -38,7 +38,7 @@ public class RentalsServiceImpl implements RentalsService {
 
   @Override
   public Rentals createRental(RentalsDTO rentalsDTO, MultipartFile picture, String token) {
-    String uploadDir = "/Users/fh.lab/Documents/Formation OCR/Developpeur Full-Stack - Java et Angular/Projet 3 - Développez le back-end en utilisant Java et Spring/images";
+    String uploadDir = "/Users/fh.lab/Documents/Images/ChatopBackendImages/images/";
     String fileName = System.currentTimeMillis() + "_" + picture.getOriginalFilename();
     Path filePath = Paths.get(uploadDir, fileName);
     try {

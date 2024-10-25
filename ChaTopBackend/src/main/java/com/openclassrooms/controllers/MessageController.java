@@ -1,8 +1,8 @@
 package com.openclassrooms.controllers;
 
 
-import com.openclassrooms.model.Message;
 import com.openclassrooms.model.MessageDTO;
+import com.openclassrooms.model.MessageResponse;
 import com.openclassrooms.services.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,13 +27,14 @@ public class MessageController {
 
   @Operation(summary = "Créer un nouveau message", description = "Crée un message en fournissant l'ID utilisateur et l'ID de la location associée.")
   @ApiResponse(responseCode = "201", description = "Message créé avec succès",
-    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Message.class)))
+    content = @Content(mediaType = "application/json", schema = @Schema(implementation = MessageResponse.class)))
   @ApiResponse(responseCode = "400", description = "Requête invalide")
   @PostMapping
-  public ResponseEntity<Message> createMessage(@RequestBody MessageDTO messageDTO) {
+  public ResponseEntity<MessageResponse> createMessage(@RequestBody MessageDTO messageDTO) {
     try {
-      Message newMessage = messageService.createMessage(messageDTO);
-      return new ResponseEntity<>(newMessage, HttpStatus.CREATED);
+      messageService.createMessage(messageDTO);
+      MessageResponse response = new MessageResponse("Message send with success");
+      return new ResponseEntity<>(response, HttpStatus.CREATED);
     } catch (Exception e) {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

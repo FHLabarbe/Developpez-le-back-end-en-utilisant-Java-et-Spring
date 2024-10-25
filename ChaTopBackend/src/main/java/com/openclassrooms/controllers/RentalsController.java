@@ -1,9 +1,6 @@
 package com.openclassrooms.controllers;
 
-import com.openclassrooms.model.RentalUpdateDTO;
-import com.openclassrooms.model.Rentals;
-import com.openclassrooms.model.RentalsDTO;
-import com.openclassrooms.model.RentalsListDTO;
+import com.openclassrooms.model.*;
 import com.openclassrooms.services.JwtService;
 import com.openclassrooms.services.RentalsServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +28,12 @@ public class RentalsController {
   @Autowired
   private RentalsServiceImpl rentalsService;
 
+  @Value("${server.base-url:http://localhost:3001}")
+  private String baseUrl;
+
+  @Value("${app.image-path:images/}")
+  private String imagePath;
+
   @Autowired
   private JwtService jwtService;
 
@@ -38,6 +42,9 @@ public class RentalsController {
   @GetMapping
   public ResponseEntity<RentalsListDTO> getAllRentals() {
     Iterable<Rentals> rentals = rentalsService.getAllRentals();
+    rentals.forEach(rental -> {
+      rental.setPicture(baseUrl + '/' + imagePath + rental.getPicture());
+    });
     RentalsListDTO responseDTO = new RentalsListDTO(rentals);
     return new ResponseEntity<>(responseDTO, HttpStatus.OK);
   }
@@ -50,6 +57,7 @@ public class RentalsController {
   public ResponseEntity<Rentals> getRentalById(@Parameter(description = "ID de la location à récupérer", example = "1")@PathVariable Long id){
     Optional<Rentals> rental = rentalsService.getRentalById(id);
     if (rental.isPresent()) {
+      rental.get().setPicture(baseUrl + '/' + imagePath + rental.get().getPicture());
       return new ResponseEntity<>(rental.get(), HttpStatus.OK);
     } else {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -60,7 +68,7 @@ public class RentalsController {
   @ApiResponse(responseCode = "200", description = "Location mise à jour avec succès")
   @ApiResponse(responseCode = "404", description = "Location non trouvée")
   @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> updateRental(@PathVariable Long id,
+  public ResponseEntity<UpdateRentalResponse> updateRental(@PathVariable Long id,
                                              @RequestParam("name") String name,
                                              @RequestParam("surface") int surface,
                                              @RequestParam("price") int price,
@@ -72,10 +80,11 @@ public class RentalsController {
       rentalUpdateDTO.setPrice(price);
       rentalUpdateDTO.setDescription(description);
       rentalsService.updateRental(id, rentalUpdateDTO);
-
-      return new ResponseEntity<>("Rental updated!", HttpStatus.OK);
+      UpdateRentalResponse response = new UpdateRentalResponse("Rental updated!");
+      return new ResponseEntity<>(response, HttpStatus.OK);
     } catch (EntityNotFoundException e) {
-      return new ResponseEntity<>("Rental not found", HttpStatus.NOT_FOUND);
+      UpdateRentalResponse response = new UpdateRentalResponse("Rental not found");
+      return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
   }
 
