@@ -14,23 +14,20 @@
 
 #### Étapes :
 
-	1.	Clonez le repository :
+1.	Clonez le repository
 
-    git clone https://github.com/ton-repository/backend-project.git
-    cd backend-project
-
-    2.	Installez les dépendances Maven :
+2.	Installez les dépendances Maven :
 
     mvn clean install
 
-    3.	Configurez le fichier application.properties dans le dossier src/main/resources. Voici un exemple de configuration pour MySQL :
+3.	Configurez le fichier application.properties dans le dossier src/main/resources. Voici un exemple de configuration pour MySQL :
 
     spring.datasource.url=jdbc:mysql://localhost:3306/nom_de_la_base_de_donnees
     spring.datasource.username=ton_nom_d_utilisateur
     spring.datasource.password=ton_mot_de_passe
     spring.jpa.hibernate.ddl-auto=update
 
-    4.	Lancez l’application :
+4.	Lancez l’application :
 
     mvn spring-boot:run
 
